@@ -68,7 +68,7 @@ for link in link_list:
     # print src_id,dst_id
     # print src_port,dst_port
     link_to_port[(src_id, dst_id)] = (src_port, dst_port)
-print link_to_port
+# print link_to_port
 
 
 
