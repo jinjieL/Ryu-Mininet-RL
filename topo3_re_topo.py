@@ -51,101 +51,101 @@ print switches
 # [1, 2, 3, 4]
 
 
-# #######################################
-# # 建立链路信息
-# #######################################
-# url = 'http://localhost:8080/v1.0/topology/links'
-# r = requests.get(url)
-# link_list = r.json()
-# # print len(link_list)
-#
-# for link in link_list:
-#     # print link
-#     src_id = int(str(link['src']['dpid']).lstrip('0'), 16)
-#     src_port = int(str(link['src']['port_no']).lstrip('0'))
-#     dst_id = int(str(link['dst']['dpid']).lstrip('0'), 16)
-#     dst_port = int(str(link['dst']['port_no']).lstrip('0'))
-#     # print src_id,dst_id
-#     # print src_port,dst_port
-#     link_to_port[(src_id, dst_id)] = (src_port, dst_port)
-# print link_to_port
-#
-#
-#
-# #######################################
-# # 建立有向图
-# #######################################
-#
-# def get_graph(link_list):
-#     """
-#     	Get Adjacency matrix from link_to_port.
-#     """
-#     _graph = graph.copy()
-#     for src in switches:
-#         for dst in switches:
-#             if src == dst:
-#                 _graph.add_edge(src, dst, weight=0)
-#             elif (src, dst) in link_list:
-#                 _graph.add_edge(src, dst, weight=1)
-#             else:
-#                 pass
-#     return _graph
-#
-#
-# graph = get_graph(link_to_port.keys())
-# # nx.draw(graph, with_labels=True)
-# # plt.show()
-# # print('All the nodes in the figure: ', graph.nodes())
-# # print('The number of nodes in the figure:', graph.number_of_nodes())
-# # print('All the edges in the figure:', graph.edges())
-# # print('The number of edges in the figure:', graph.number_of_edges())
-#
-#
-# #################################
-# # 所有端点的k-path
-# #################################
-# def k_shortest_paths(graph, src, dst, weight='weight', k=5):
-#     """
-#         Creat K shortest paths from src to dst.
-#         generator produces lists of simple paths, in order from shortest to longest.
-#         创建从src到dst的K个最短路径。
-#         生成器按照从最短到最长的顺序生成简单路径列表。
-#     """
-#     generator = nx.shortest_simple_paths(graph, source=src, target=dst, weight=weight)
-#     shortest_paths = []
-#     try:
-#         for path in generator:
-#             if k <= 0:
-#                 break
-#             shortest_paths.append(path)
-#             k -= 1
-#         return shortest_paths
-#     except:
-#         print ("No path between %s and %s" % (src, dst))
-#
-# def all_k_shortest_paths(graph, weight='weight', k=5):
-#     """
-#     	Creat all K shortest paths between datapaths.
-#     	Note: We get shortest paths for bandwidth-sensitive
-#     	traffic from bandwidth-sensitive switches.
-#     	在数据路径之间创建所有K个最短路径。
-#     	注意：我们从带宽敏感交换机为带宽敏感流量获得最短路径。
-#     """
-#     _graph = graph.copy()
-#     paths = {}
-#     # Find k shortest paths in graph.
-#     for src in _graph.nodes():
-#         paths.setdefault(src, {src: [[src] for i in xrange(k)]})
-#         for dst in _graph.nodes():
-#             if src == dst:
-#                 continue
-#             paths[src].setdefault(dst, [])
-#             paths[src][dst] = k_shortest_paths(_graph, src, dst, weight=weight, k=k)
-#     return paths
-#
-#
-# shortest_paths = all_k_shortest_paths(graph, weight='weight', k=2)
-# print(shortest_paths[1][2])
+#######################################
+# 建立链路信息
+#######################################
+url = 'http://localhost:8080/v1.0/topology/links'
+r = requests.get(url)
+link_list = r.json()
+# print len(link_list)
+
+for link in link_list:
+    # print link
+    src_id = int(str(link['src']['dpid']).lstrip('0'), 16)
+    src_port = int(str(link['src']['port_no']).lstrip('0'))
+    dst_id = int(str(link['dst']['dpid']).lstrip('0'), 16)
+    dst_port = int(str(link['dst']['port_no']).lstrip('0'))
+    # print src_id,dst_id
+    # print src_port,dst_port
+    link_to_port[(src_id, dst_id)] = (src_port, dst_port)
+print link_to_port
+
+
+
+#######################################
+# 建立有向图
+#######################################
+
+def get_graph(link_list):
+    """
+    	Get Adjacency matrix from link_to_port.
+    """
+    _graph = graph.copy()
+    for src in switches:
+        for dst in switches:
+            if src == dst:
+                _graph.add_edge(src, dst, weight=0)
+            elif (src, dst) in link_list:
+                _graph.add_edge(src, dst, weight=1)
+            else:
+                pass
+    return _graph
+
+
+graph = get_graph(link_to_port.keys())
+# nx.draw(graph, with_labels=True)
+# plt.show()
+# print('All the nodes in the figure: ', graph.nodes())
+# print('The number of nodes in the figure:', graph.number_of_nodes())
+# print('All the edges in the figure:', graph.edges())
+# print('The number of edges in the figure:', graph.number_of_edges())
+
+
+#################################
+# 所有端点的k-path
+#################################
+def k_shortest_paths(graph, src, dst, weight='weight', k=5):
+    """
+        Creat K shortest paths from src to dst.
+        generator produces lists of simple paths, in order from shortest to longest.
+        创建从src到dst的K个最短路径。
+        生成器按照从最短到最长的顺序生成简单路径列表。
+    """
+    generator = nx.shortest_simple_paths(graph, source=src, target=dst, weight=weight)
+    shortest_paths = []
+    try:
+        for path in generator:
+            if k <= 0:
+                break
+            shortest_paths.append(path)
+            k -= 1
+        return shortest_paths
+    except:
+        print ("No path between %s and %s" % (src, dst))
+
+def all_k_shortest_paths(graph, weight='weight', k=5):
+    """
+    	Creat all K shortest paths between datapaths.
+    	Note: We get shortest paths for bandwidth-sensitive
+    	traffic from bandwidth-sensitive switches.
+    	在数据路径之间创建所有K个最短路径。
+    	注意：我们从带宽敏感交换机为带宽敏感流量获得最短路径。
+    """
+    _graph = graph.copy()
+    paths = {}
+    # Find k shortest paths in graph.
+    for src in _graph.nodes():
+        paths.setdefault(src, {src: [[src] for i in xrange(k)]})
+        for dst in _graph.nodes():
+            if src == dst:
+                continue
+            paths[src].setdefault(dst, [])
+            paths[src][dst] = k_shortest_paths(_graph, src, dst, weight=weight, k=k)
+    return paths
+
+
+shortest_paths = all_k_shortest_paths(graph, weight='weight', k=2)
+print(shortest_paths[1][2])
 
 
 
